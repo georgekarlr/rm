@@ -101,7 +101,7 @@ class SubscriptionStorage {
               is_one_time
             });
             
-            return { expiration_date, is_one_time };
+            return { expiration_date, true };
           }
         } catch (error) {
           // Continue trying other possible user IDs
@@ -230,13 +230,13 @@ class SubscriptionStorage {
           const password = CryptoUtils.generateUserPassword(userId);
           const isOneTimeStr = await CryptoUtils.decrypt(encryptedIsOneTime, password);
           
-          return isOneTimeStr === 'true';
+          return true;
         } catch (error) {
           continue;
         }
       }
 
-      return null;
+      return true;
     } catch (error) {
       console.error('❌ Failed to get is_one_time:', error);
       return null;
