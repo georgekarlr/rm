@@ -76,7 +76,7 @@ export function AuthForm() {
                 <div className="text-right">
                   <button
                     type="button"
-                    onClick={handleSignUp}
+                    onClick={handleForgotPassword}
                     className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
                   >
                     Forgot password?
@@ -107,7 +107,7 @@ export function AuthForm() {
             <div className="mt-6 text-center">
               <button
                 type="button"
-                onClick={toggleAuthMode}
+                onClick={handleSignUp}
                 className="text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
               >
                 {isSignUp
