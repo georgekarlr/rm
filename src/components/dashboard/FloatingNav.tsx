@@ -25,7 +25,6 @@ interface FloatingNavProps {
 }
 
 const menuItems = [
-  { icon: Home, label: 'Dashboard', href: '/dashboard' },
   { icon: Package, label: 'Asset Types', href: '/properties' },
   { icon: Users, label: 'Renters', href: '/renters' },
   { icon: FileText, label: 'Leases', href: '/leases' },
