@@ -9,24 +9,16 @@ import { useCurrentUser } from '../../../hooks/useCurrentUser';
 import type { TabProps, RMUser } from './types';
 
 export function DeleteUserTab({ users, onUserAdded }: TabProps) {
-  const { currentUser, isSubscribed, isLifetime } = useCurrentUser();
+  const { currentUser } = useCurrentUser();
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
 
   // Check if current user is admin
   const isAdmin = currentUser?.user_type === 'admin';
-  
-  // Check if user has subscription access
-  const hasSubscriptionAccess = isSubscribed || isLifetime;
 
   const handleDeleteUser = async (user: RMUser) => {
     if (!isAdmin) {
       setMessage({ type: 'error', text: 'Only admin users can delete users' });
-      return;
-    }
-    
-    if (!hasSubscriptionAccess) {
-      setMessage({ type: 'error', text: 'You need an active subscription to delete users' });
       return;
     }
 
@@ -110,24 +102,6 @@ export function DeleteUserTab({ users, onUserAdded }: TabProps) {
       defaultUser.name === user.name && defaultUser.user_type === user.user_type
     )
   );
-
-  // Show subscription required message if not subscribed
-  if (!hasSubscriptionAccess) {
-    return (
-      <div className="space-y-4">
-        <Alert
-          type="warning"
-          title="Subscription Required"
-          message="You need an active Ceintelly subscription to delete users. Please subscribe to unlock this feature."
-        />
-        <div className="text-center py-8 text-gray-500">
-          <Shield className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-          <p>Subscription required</p>
-          <p className="text-xs mt-1">Visit <a href="https://ceintelly.org" className="text-blue-600 hover:underline">ceintelly.org</a> to subscribe</p>
-        </div>
-      </div>
-    );
-  }
 
   // Show permission error if not admin
   if (!isAdmin) {

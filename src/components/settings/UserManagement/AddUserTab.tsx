@@ -8,7 +8,7 @@ import { useCurrentUser } from '../../../hooks/useCurrentUser';
 import type { TabProps, FormData } from './types';
 
 export function AddUserTab({ onUserAdded }: TabProps) {
-  const { currentUser, isSubscribed, isLifetime } = useCurrentUser();
+  const { currentUser } = useCurrentUser();
   // Set leaser as default and only user type
   const [formData, setFormData] = useState<FormData>({ 
     name: '', 
@@ -20,9 +20,6 @@ export function AddUserTab({ onUserAdded }: TabProps) {
 
   // Check if current user is admin
   const isAdmin = currentUser?.user_type === 'admin';
-  
-  // Check if user has subscription access
-  const hasSubscriptionAccess = isSubscribed || isLifetime;
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({
@@ -36,11 +33,6 @@ export function AddUserTab({ onUserAdded }: TabProps) {
     
     if (!isAdmin) {
       setMessage({ type: 'error', text: 'Only admin users can add new users' });
-      return;
-    }
-    
-    if (!hasSubscriptionAccess) {
-      setMessage({ type: 'error', text: 'You need an active subscription to add users' });
       return;
     }
 
@@ -189,24 +181,6 @@ export function AddUserTab({ onUserAdded }: TabProps) {
       setSubmitting(false);
     }
   };
-
-  // Show subscription required message if not subscribed
-  if (!hasSubscriptionAccess) {
-    return (
-      <div className="space-y-4">
-        <Alert
-          type="warning"
-          title="Subscription Required"
-          message="You need an active Ceintelly subscription to add users. Please subscribe to unlock this feature."
-        />
-        <div className="text-center py-8 text-gray-500">
-          <Shield className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-          <p>Subscription required</p>
-          <p className="text-xs mt-1">Visit <a href="https://ceintelly.org" className="text-blue-600 hover:underline">ceintelly.org</a> to subscribe</p>
-        </div>
-      </div>
-    );
-  }
 
   // Show permission error if not admin
   if (!isAdmin) {

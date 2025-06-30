@@ -2,7 +2,6 @@ import React from 'react';
 import { CreditCard, CheckCircle, AlertTriangle, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { CeintellyLogo } from '../CeintellyLogo';
 import type { SubscriptionStatus } from '../../types/subscription';
 
 interface SubscriptionCardProps {
@@ -42,7 +41,7 @@ export function SubscriptionCard({ subscriptionStatus, loading }: SubscriptionCa
         <CardHeader>
           <div className="flex items-center space-x-2">
             <CreditCard className="h-5 w-5 text-blue-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Ceintelly Subscription</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Subscription</h2>
           </div>
         </CardHeader>
         <CardContent>
@@ -59,7 +58,7 @@ export function SubscriptionCard({ subscriptionStatus, loading }: SubscriptionCa
     <Card>
       <CardHeader>
         <div className="flex items-center space-x-2">
-          <CeintellyLogo width={24} height={24} />
+          <CreditCard className="h-5 w-5 text-blue-600" />
           <h2 className="text-lg font-semibold text-gray-900">Ceintelly Subscription</h2>
         </div>
       </CardHeader>

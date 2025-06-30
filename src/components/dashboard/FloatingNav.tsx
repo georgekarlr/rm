@@ -18,7 +18,6 @@ import { Link, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { Button } from '../ui/Button';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
-import { CeintellyLogo } from '../CeintellyLogo';
 
 interface FloatingNavProps {
   isOpen: boolean;
@@ -48,7 +47,7 @@ const userTypeColors = {
 
 export function FloatingNav({ isOpen, onClose }: FloatingNavProps) {
   const location = useLocation();
-  const { currentUser, isSubscribed, isLifetime } = useCurrentUser();
+  const { currentUser } = useCurrentUser();
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -76,7 +75,9 @@ export function FloatingNav({ isOpen, onClose }: FloatingNavProps) {
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
             <Link to="/dashboard" className="flex items-center space-x-3" onClick={onClose}>
-              <CeintellyLogo width={40} height={40} />
+              <div className="p-2 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg">
+                <Home className="h-6 w-6 text-white" />
+              </div>
               <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                 RentManager
               </span>
@@ -100,16 +101,9 @@ export function FloatingNav({ isOpen, onClose }: FloatingNavProps) {
                   <p className="text-sm font-semibold text-gray-900 truncate">
                     {currentUser.name}
                   </p>
-                  <div className="flex items-center">
-                    <p className="text-xs text-gray-600 capitalize">
-                      {currentUser.user_type} access
-                    </p>
-                    {!isSubscribed && !isLifetime && currentUser.user_type === 'viewer' && (
-                      <span className="ml-2 text-xs px-1.5 py-0.5 bg-yellow-100 text-yellow-800 rounded-sm">
-                        Unsubscribed
-                      </span>
-                    )}
-                  </div>
+                  <p className="text-xs text-gray-600 capitalize">
+                    {currentUser.user_type} access
+                  </p>
                 </div>
               </div>
             </div>
@@ -179,7 +173,11 @@ export function FloatingNav({ isOpen, onClose }: FloatingNavProps) {
                 rel="noopener noreferrer"
                 className="flex items-center justify-center space-x-2 text-sm text-gray-600 hover:text-blue-600 transition-colors p-2"
               >
-                <CeintellyLogo width={20} height={20} />
+                <img 
+                  src="/ceintelly-logo.svg" 
+                  alt="Ceintelly" 
+                  className="h-5 w-5"
+                />
                 <span>Powered by Ceintelly</span>
                 <ExternalLink className="h-3.5 w-3.5" />
               </a>

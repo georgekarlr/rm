@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { useSubscription } from '../hooks/useSubscription';
 import CurrentUserStorage from '../utils/currentUserStorage';
 import type { RMUser } from '../types/subscription';
 
@@ -10,8 +9,6 @@ interface UserState {
   loading: boolean;
   error: string | null;
   initialized: boolean;
-  isSubscribed: boolean;
-  isLifetime: boolean;
 }
 
 // User actions
@@ -20,7 +17,6 @@ type UserAction =
   | { type: 'SET_USER'; payload: RMUser | null }
   | { type: 'SET_ERROR'; payload: string | null }
   | { type: 'SET_INITIALIZED'; payload: boolean }
-  | { type: 'SET_SUBSCRIPTION_STATUS'; payload: { isSubscribed: boolean; isLifetime: boolean } }
   | { type: 'RESET_STATE' };
 
 // User context interface
@@ -42,8 +38,6 @@ const initialState: UserState = {
   loading: true,
   error: null,
   initialized: false,
-  isSubscribed: false,
-  isLifetime: false,
 };
 
 // User reducer
@@ -63,12 +57,6 @@ function userReducer(state: UserState, action: UserAction): UserState {
       return { ...state, error: action.payload, loading: false };
     case 'SET_INITIALIZED':
       return { ...state, initialized: action.payload };
-    case 'SET_SUBSCRIPTION_STATUS':
-      return { 
-        ...state, 
-        isSubscribed: action.payload.isSubscribed,
-        isLifetime: action.payload.isLifetime
-      };
     case 'RESET_STATE':
       return { 
         ...initialState, 
@@ -87,21 +75,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 // User provider component
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const { user: authUser, loading: authLoading } = useAuth();
-  const { subscriptionStatus, loading: subscriptionLoading } = useSubscription();
   const [state, dispatch] = useReducer(userReducer, initialState);
-
-  // Update subscription status when it changes
-  useEffect(() => {
-    if (!subscriptionLoading) {
-      dispatch({ 
-        type: 'SET_SUBSCRIPTION_STATUS', 
-        payload: { 
-          isSubscribed: subscriptionStatus.isSubscribed,
-          isLifetime: subscriptionStatus.isLifetime
-        } 
-      });
-    }
-  }, [subscriptionStatus, subscriptionLoading]);
 
   // Load current user from separate encrypted storage
   const loadCurrentUser = async (forceReload = false) => {
@@ -122,17 +96,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       const storedUser = await CurrentUserStorage.retrieveCurrentUser(authUser.id);
       
       if (storedUser && storedUser.name && storedUser.user_type) {
-        // Check subscription status - if not subscribed and not lifetime, force viewer role
-        if (!state.isSubscribed && !state.isLifetime && storedUser.user_type !== 'viewer') {
-          console.log('🔒 User is not subscribed. Forcing viewer role.');
-          const restrictedUser = { ...storedUser, user_type: 'viewer' };
-          dispatch({ type: 'SET_USER', payload: restrictedUser });
-          
-          // Don't update storage - keep the original role for when they subscribe
-        } else {
-          dispatch({ type: 'SET_USER', payload: storedUser });
-          console.log('🔐 Current user loaded from separate encrypted storage:', storedUser);
-        }
+        dispatch({ type: 'SET_USER', payload: storedUser });
+        console.log('🔐 Current user loaded from separate encrypted storage:', storedUser);
       } else {
         // Set default user if none stored or invalid
         dispatch({ type: 'SET_USER', payload: defaultUser });
@@ -165,32 +130,23 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       
-      // Check subscription status - if not subscribed and not lifetime, force viewer role
-      let userToStore = newUser;
-      if (!state.isSubscribed && !state.isLifetime && newUser.user_type !== 'viewer') {
-        console.log('🔒 User is not subscribed. Forcing viewer role for display.');
-        userToStore = { ...newUser, user_type: 'viewer' };
-      }
-      
-      // Always store the original user data (even if we're displaying a restricted version)
-      // This way when they subscribe, they get their proper role back
+      // Update in separate encrypted storage (not in settings storage)
       await CurrentUserStorage.storeCurrentUser(newUser, authUser.id);
       
-      // Update state with potentially restricted user
-      dispatch({ type: 'SET_USER', payload: userToStore });
+      // Update state
+      dispatch({ type: 'SET_USER', payload: newUser });
       
       console.log('🔐 Current user updated in separate encrypted storage:', newUser);
-      console.log('🔐 Current user displayed as:', userToStore);
       
       // Broadcast the change to other components/tabs
       try {
         window.dispatchEvent(new CustomEvent('userChanged', { 
-          detail: { user: userToStore } 
+          detail: { user: newUser } 
         }));
         
         // Also use localStorage event for cross-tab communication
         localStorage.setItem('rm_user_change_event', JSON.stringify({
-          user: userToStore,
+          user: newUser,
           timestamp: Date.now()
         }));
         localStorage.removeItem('rm_user_change_event'); // Trigger storage event
@@ -275,26 +231,18 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     try {
       dispatch({ type: 'SET_LOADING', payload: true });
       
-      // Check subscription status - if not subscribed and not lifetime, force viewer role
-      let userTypeToDisplay = userType;
-      if (!state.isSubscribed && !state.isLifetime && userType !== 'viewer') {
-        console.log('🔒 User is not subscribed. Forcing viewer role for display.');
-        userTypeToDisplay = 'viewer';
-      }
-      
-      // Always store the original user type (even if we're displaying a restricted version)
+      // Update only the user_type in separate encrypted storage
       await CurrentUserStorage.updateUserType(userType, authUser.id);
       
-      // Update state with potentially restricted user type
+      // Update state with new user_type, keeping existing name
       const updatedUser = { 
         ...state.currentUser, 
-        user_type: userTypeToDisplay 
+        user_type: userType 
       } as RMUser;
       
       dispatch({ type: 'SET_USER', payload: updatedUser });
       
-      console.log('🔐 User type stored as:', userType);
-      console.log('🔐 User type displayed as:', userTypeToDisplay);
+      console.log('🔐 User type updated separately:', userType);
       
       // Broadcast the change
       try {
@@ -326,7 +274,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   // Load user when auth user changes or becomes available
   useEffect(() => {
     // Only proceed if auth is not loading
-    if (authLoading || subscriptionLoading) {
+    if (authLoading) {
       return;
     }
 
@@ -337,7 +285,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       // Clear storage when user signs out
       CurrentUserStorage.clearCurrentUser();
     }
-  }, [authUser, authLoading, subscriptionLoading, state.isSubscribed, state.isLifetime]);
+  }, [authUser, authLoading]);
 
   // Listen for user changes from other components/tabs
   useEffect(() => {

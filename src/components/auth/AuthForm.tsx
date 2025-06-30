@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader } from '../ui/Card';
 import { Alert } from '../ui/Alert';
 import { Home, Mail, Lock, UserPlus, LogIn, ExternalLink } from 'lucide-react';
 import { useAuthFormLogic } from '../../hooks/useAuthFormLogic';
-import { CeintellyLogo } from '../CeintellyLogo';
 
 export function AuthForm() {
   const {
@@ -26,7 +25,9 @@ export function AuthForm() {
         <Card>
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <CeintellyLogo width={60} height={60} />
+              <div className="p-3 bg-blue-100 rounded-full">
+                <Home className="h-8 w-8 text-blue-600" />
+              </div>
             </div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">
               Rent Management

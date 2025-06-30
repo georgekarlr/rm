@@ -1,15 +1,9 @@
 import React from 'react';
 import { Users } from 'lucide-react';
 import { userTypeConfig } from './constants';
-import type { RMUser } from '../../../types/subscription';
+import type { CurrentUserDisplayProps } from './types';
 
-interface CurrentUserDisplayProps {
-  currentUser: RMUser | null;
-  isSubscribed?: boolean;
-  isLifetime?: boolean;
-}
-
-export function CurrentUserDisplay({ currentUser, isSubscribed, isLifetime }: CurrentUserDisplayProps) {
+export function CurrentUserDisplay({ currentUser }: CurrentUserDisplayProps) {
   if (!currentUser) return null;
 
   const config = userTypeConfig[currentUser.user_type as keyof typeof userTypeConfig] || userTypeConfig.unknown;
@@ -23,14 +17,7 @@ export function CurrentUserDisplay({ currentUser, isSubscribed, isLifetime }: Cu
         </div>
         <div>
           <p className="font-medium text-blue-900">Current User: {currentUser.name}</p>
-          <div className="flex items-center space-x-2">
-            <p className="text-sm text-blue-700 capitalize">Role: {currentUser.user_type}</p>
-            {!isSubscribed && !isLifetime && currentUser.user_type === 'viewer' && (
-              <span className="text-xs px-2 py-0.5 bg-yellow-100 text-yellow-800 rounded-full">
-                Unsubscribed
-              </span>
-            )}
-          </div>
+          <p className="text-sm text-blue-700 capitalize">Role: {currentUser.user_type}</p>
         </div>
       </div>
     </div>

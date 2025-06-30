@@ -12,14 +12,11 @@ import { defaultUsers } from './constants';
 import type { UserManagementProps, TabType } from './types';
 
 export function UserManagement({ users, loading, onUserAdded }: UserManagementProps) {
-  const { currentUser, isSubscribed, isLifetime } = useCurrentUser();
+  const { currentUser } = useCurrentUser();
   const [activeTab, setActiveTab] = useState<TabType>('change');
 
   // Check if current user is admin
   const isAdmin = currentUser?.user_type === 'admin';
-  
-  // Check if user has subscription access
-  const hasSubscriptionAccess = isSubscribed || isLifetime;
 
   // Combine default users with existing users, avoiding duplicates
   const allUsers = useMemo(() => {
@@ -52,26 +49,13 @@ export function UserManagement({ users, loading, onUserAdded }: UserManagementPr
       );
     }
 
-    // If not subscribed, show subscription required message
-    if (!hasSubscriptionAccess && activeTab !== 'change') {
-      return (
-        <Alert
-          type="warning"
-          title="Subscription Required"
-          message="You need an active Ceintelly subscription to access advanced user management features. Please subscribe to unlock these features."
-        />
-      );
-    }
-
     switch (activeTab) {
       case 'change':
         return <ChangeUserTab users={allUsers} loading={loading} />;
       case 'add':
-        return isAdmin && hasSubscriptionAccess ? 
-          <AddUserTab users={allUsers} loading={loading} onUserAdded={onUserAdded} /> : null;
+        return isAdmin ? <AddUserTab users={allUsers} loading={loading} onUserAdded={onUserAdded} /> : null;
       case 'delete':
-        return isAdmin && hasSubscriptionAccess ? 
-          <DeleteUserTab users={allUsers} loading={loading} onUserAdded={onUserAdded} /> : null;
+        return isAdmin ? <DeleteUserTab users={allUsers} loading={loading} onUserAdded={onUserAdded} /> : null;
       default:
         return null;
     }
@@ -96,15 +80,6 @@ export function UserManagement({ users, loading, onUserAdded }: UserManagementPr
         </div>
       </CardHeader>
       <CardContent>
-        {/* Subscription Status Notice */}
-        {!hasSubscriptionAccess && (
-          <Alert
-            type="warning"
-            message="You are using the free version with limited features. Subscribe to Ceintelly to unlock advanced user management and other premium features."
-            className="mb-6"
-          />
-        )}
-
         {/* Admin Permission Notice */}
         {!isAdmin && (
           <Alert
@@ -115,7 +90,7 @@ export function UserManagement({ users, loading, onUserAdded }: UserManagementPr
         )}
 
         {/* Admin Features Notice */}
-        {isAdmin && hasSubscriptionAccess && (
+        {isAdmin && (
           <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
             <div className="flex items-center space-x-2">
               <Users className="h-5 w-5 text-purple-600" />

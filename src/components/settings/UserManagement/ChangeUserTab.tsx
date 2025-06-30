@@ -11,7 +11,7 @@ import { supabase } from '../../../lib/supabase';
 import type { TabProps, FormData, ValidationResult, RMUser } from './types';
 
 export function ChangeUserTab({ users }: TabProps) {
-  const { currentUser, updateCurrentUser, isSubscribed, isLifetime } = useCurrentUser();
+  const { currentUser, updateCurrentUser } = useCurrentUser();
   const [selectedUser, setSelectedUser] = useState<RMUser | null>(null);
   const [formData, setFormData] = useState<FormData>({ name: '', user_type: '', password: '' });
   const [submitting, setSubmitting] = useState(false);
@@ -71,14 +71,6 @@ export function ChangeUserTab({ users }: TabProps) {
         }
       }
 
-      // Check if user is trying to select a non-viewer role without subscription
-      if (!isSubscribed && !isLifetime && selectedUser.user_type !== 'viewer') {
-        setMessage({ 
-          type: 'error', 
-          text: 'You need an active subscription to use non-viewer roles. The user will be set as a viewer until you subscribe.' 
-        });
-      }
-
       // Update current user - this will now persist across refreshes
       await updateCurrentUser(selectedUser);
       
@@ -109,7 +101,7 @@ export function ChangeUserTab({ users }: TabProps) {
 
   return (
     <div className="space-y-4">
-      <CurrentUserDisplay currentUser={currentUser} isSubscribed={isSubscribed} isLifetime={isLifetime} />
+      <CurrentUserDisplay currentUser={currentUser} />
 
       {/* Persistence Info */}
       <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
@@ -122,15 +114,6 @@ export function ChangeUserTab({ users }: TabProps) {
           page navigation, and browser sessions until you sign out or change users.
         </p>
       </div>
-
-      {/* Subscription Warning */}
-      {!isSubscribed && !isLifetime && (
-        <Alert
-          type="warning"
-          title="Subscription Required for Full Access"
-          message="Without an active subscription, you can only use the viewer role. Subscribe to Ceintelly to unlock admin and leaser roles."
-        />
-      )}
 
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -187,14 +170,6 @@ export function ChangeUserTab({ users }: TabProps) {
                 }
               </p>
             </div>
-          )}
-
-          {/* Subscription Warning for Non-Viewer Roles */}
-          {!isSubscribed && !isLifetime && selectedUser.user_type !== 'viewer' && (
-            <Alert
-              type="warning"
-              message="Without an active subscription, this user will be set as a viewer. Subscribe to use admin and leaser roles."
-            />
           )}
 
           <Button type="submit" className="w-full" loading={submitting}>

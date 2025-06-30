@@ -14,9 +14,7 @@ export function useCurrentUser() {
     updateUserType,
     clearCurrentUser,
     refreshUser,
-    defaultUser,
-    isSubscribed,
-    isLifetime
+    defaultUser
   } = useUserContext();
 
   return {
@@ -28,8 +26,6 @@ export function useCurrentUser() {
     updateUserType,
     clearCurrentUser,
     refreshUser,
-    defaultUser,
-    isSubscribed,
-    isLifetime
+    defaultUser
   };
 }
