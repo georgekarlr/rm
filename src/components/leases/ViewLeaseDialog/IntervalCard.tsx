@@ -48,7 +48,7 @@ export function IntervalCard({ interval, isHighlighted = false }: IntervalCardPr
           </div>
         </div>
         
-        {/*<div className="text-right">
+        <div className="text-right">
           <div className="flex items-center space-x-2">
             <PaymentIcon className={`h-4 w-4 ${paymentConfig.color}`} />
             <span className="text-lg font-bold text-gray-900">
@@ -59,7 +59,7 @@ export function IntervalCard({ interval, isHighlighted = false }: IntervalCardPr
             {paymentConfig.label}
           </span>
         </div>
-      </div>*/}
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-600">
         <div className="flex items-center space-x-2">
