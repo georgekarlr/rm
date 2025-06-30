@@ -26,6 +26,7 @@ interface FloatingNavProps {
 }
 
 const menuItems = [
+  { icon: Home, label: 'Dashboard', href: '/dashboard' },
   { icon: Package, label: 'Asset Types', href: '/properties' },
   { icon: Users, label: 'Renters', href: '/renters' },
   { icon: FileText, label: 'Leases', href: '/leases' },
@@ -74,7 +75,7 @@ export function FloatingNav({ isOpen, onClose }: FloatingNavProps) {
         <div className="bg-white shadow-2xl border-r border-gray-200 h-full flex flex-col overflow-hidden">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gradient-to-r from-blue-50 to-purple-50">
-            <Link to="/properties" className="flex items-center space-x-3" onClick={onClose}>
+            <Link to="/dashboard" className="flex items-center space-x-3" onClick={onClose}>
               <CeintellyLogo width={40} height={40} />
               <span className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
                 RentManager

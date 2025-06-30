@@ -101,7 +101,7 @@ function App() {
           />
 
           {/* Default redirect */}
-          <Route path="/" element={<Navigate to="/properties" replace />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </UserProvider>
     </Router>

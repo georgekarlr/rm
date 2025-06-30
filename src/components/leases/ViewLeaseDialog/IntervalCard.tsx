@@ -58,8 +58,8 @@ export function IntervalCard({ interval, isHighlighted = false }: IntervalCardPr
           <span className={`text-xs px-2 py-1 rounded-full ${paymentConfig.bg} ${paymentConfig.color} font-medium`}>
             {paymentConfig.label}
           </span>
-        </div>*/}
-      </div>
+        </div>
+      </div>*/}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-gray-600">
         <div className="flex items-center space-x-2">

@@ -26,8 +26,8 @@ export function useSubscription(subscriptionId: number = 1) {
         // If the function fails, create fallback data with default users only
         const fallbackData = {
           id: subscriptionId,
-          rm_expiration_date: 2026-06-30 10:16,
-          is_one_time: true,
+          rm_expiration_date: null,
+          is_one_time: false,
           rm_users: [
             { name: 'Everyone', user_type: 'viewer' },
             { name: 'Owner', user_type: 'admin' }
